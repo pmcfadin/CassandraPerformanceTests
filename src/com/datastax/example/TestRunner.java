@@ -3,6 +3,11 @@ package com.datastax.example;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
+
 /*
 Copyright 2014 Patrick McFadin
 
@@ -24,7 +29,33 @@ public class TestRunner {
 
     static final Logger logger = LoggerFactory.getLogger(TestRunner.class);
 
+
+
     public static void main(String[] args) {
+
         logger.info("Test runner started");
+
+        Properties prop = new Properties();
+
+        try {
+            prop.load(new FileInputStream("resources/test.properties"));
+
+        } catch (FileNotFoundException e) {
+           logger.error("test.properties not found");
+           System.exit(1);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            System.exit(1);
+        }
+
+        BatchVsExecuteAsync batchTest = new BatchVsExecuteAsync();
+        MapSizeTest mapTest = new MapSizeTest();
+
+        batchTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
+        batchTest.cleanup();
+
+        mapTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
+        mapTest.allTests();
+        mapTest.cleanup();
     }
 }

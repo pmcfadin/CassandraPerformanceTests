@@ -1,9 +1,5 @@
 package com.datastax.example;
 
-import com.datastax.example.base.TestBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /*
 
 Copyright 2014 Patrick McFadin
@@ -21,7 +17,5 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-public class PreparedVsNonPreparedStatement extends TestBase {
-    final Logger logger = LoggerFactory.getLogger(BatchVsExecuteAsync.class);
-
+public class RowCacheVsPartitionCache {
 }

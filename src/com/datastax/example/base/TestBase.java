@@ -1,5 +1,13 @@
 package com.datastax.example.base;
 
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Session;
+import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
+import com.datastax.driver.core.policies.DefaultRetryPolicy;
+import com.datastax.driver.core.policies.TokenAwarePolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /*
 
 Copyright 2014 Patrick McFadin
@@ -18,4 +26,39 @@ limitations under the License.
 
 */
 public class TestBase {
+
+    final Logger logger = LoggerFactory.getLogger(TestBase.class);
+
+    public Cluster cluster;
+    public Session session;
+
+    /**
+     * Basic Cassandra connection initializer. Takes the cluster IPs and keyspace. Connects using TokenAwarePolicy.
+     *
+     * @param clusterIps
+     * @param keySpace
+     */
+    public void initialize(String clusterIps, String keySpace) {
+        cluster = Cluster
+                .builder()
+                .addContactPoint(clusterIps)
+                .withRetryPolicy(DefaultRetryPolicy.INSTANCE)
+                .withLoadBalancingPolicy(
+                        new TokenAwarePolicy(new DCAwareRoundRobinPolicy()))
+                .build();
+
+        session = cluster.connect(keySpace);
+
+        logger.info("Cassandra connection established to: " + clusterIps + " Keyspace: " + keySpace);
+    }
+
+    /**
+     * Tear down connection before closing.
+     */
+    public void cleanup() {
+        session.close();
+        cluster.close();
+
+        logger.info("Cassandra connection closed");
+    }
 }
