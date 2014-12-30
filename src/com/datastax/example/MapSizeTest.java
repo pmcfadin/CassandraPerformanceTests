@@ -1,8 +1,17 @@
 package com.datastax.example;
 
+import com.codahale.metrics.*;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import com.datastax.example.base.TestBase;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 /*
 
@@ -23,7 +32,38 @@ limitations under the License.
 */
 public class MapSizeTest extends TestBase {
 
+    static final MetricRegistry metrics = new MetricRegistry();
+    private final Timer requestLatency = metrics.timer(MetricRegistry.name(MapSizeTest.class, "requestLatency"));
+
     final Logger logger = LoggerFactory.getLogger(MapSizeTest.class);
+
+
+    @Override
+    public void schemaSetup() {
+        //Check for schema
+
+        logger.info("Checking for MapSizeTest schema");
+
+        ResultSet result = session.execute("select keyspace_name, columnfamily_name from system.schema_columnfamilies where keyspace_name = 'perf_test' and columnfamily_name = 'maptest';");
+
+        if (result.one() == null) {
+            logger.info("MapSizeTest schema does not exist. Creating...");
+
+            result = session.execute("CREATE TABLE maptest (\n" +
+                    "    id int PRIMARY KEY,\n" +
+                    "    textMap map<text,text>,\n" +
+                    "    intMap map<int,int>\n" +
+                    ");");
+
+            for(Row row: result){
+                logger.info(row.toString());
+            }
+            logger.info("MapSizeTest schema created");
+
+        } else {
+            logger.info("MapSizeTest schema exists");
+        }
+    }
 
     public void allTests() {
         logger.info("Beginning all tests for MapSizeTest");
@@ -35,23 +75,31 @@ public class MapSizeTest extends TestBase {
 
     public void test1() {
 
+        final CsvReporter reporter = CsvReporter.forRegistry(metrics)
+                .formatFor(Locale.US)
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .build(new File("/Users/patrick/projects/"));
+
         logger.info("Beginning MapSizeTest:Test1");
 
         int key = 0;
 
+        reporter.start(1, TimeUnit.SECONDS);
+
         //Insert 100 items at a time, up to 64k items
         for (int i = 0; i < 640; i++) {
-            long startTime = System.nanoTime();
 
             for (int j = 0; j < 100; j++) {
 
+                final Timer.Context context = requestLatency.time();
                 session.execute("update maptest set intMap = {" + key + ":" + key + "} where id = 0");
+                context.stop();
 
                 key++;
             }
-            logger.info("Total time for 100 updates: " + (System.nanoTime() - startTime));
-
         }
+
         logger.info("Completed MapSizeTest:Test1");
     }
 }

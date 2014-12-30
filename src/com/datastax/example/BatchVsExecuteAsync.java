@@ -1,5 +1,7 @@
 package com.datastax.example;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.datastax.example.base.TestBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,16 @@ limitations under the License.
 */
 public class BatchVsExecuteAsync extends TestBase {
     final Logger logger = LoggerFactory.getLogger(BatchVsExecuteAsync.class);
+    static final MetricRegistry metrics = new MetricRegistry();
+    private final Timer test1 = metrics.timer(MetricRegistry.name(PreparedVsNonPreparedStatement.class, "test1"));
+    private final Timer test2 = metrics.timer(MetricRegistry.name(PreparedVsNonPreparedStatement.class, "test2"));
 
+    public void allTests() {
+        logger.info("Beginning all tests for PreparedVsNonPreparedStatement");
 
+        //test1();
+        //test2();
+
+        logger.info("All tests for PreparedVsNonPreparedStatement complete");
+    }
 }

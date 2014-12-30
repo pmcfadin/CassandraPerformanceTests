@@ -50,12 +50,22 @@ public class TestRunner {
 
         BatchVsExecuteAsync batchTest = new BatchVsExecuteAsync();
         MapSizeTest mapTest = new MapSizeTest();
+        PreparedVsNonPreparedStatement psTest = new PreparedVsNonPreparedStatement();
+        RowCacheVsPartitionCache cacheTest = new RowCacheVsPartitionCache();
 
-        batchTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
-        batchTest.cleanup();
+        //batchTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
+       // batchTest.cleanup();
 
-        mapTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
-        mapTest.allTests();
-        mapTest.cleanup();
+        //mapTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
+        //mapTest.allTests();
+        //mapTest.cleanup();
+
+        //psTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
+        //psTest.allTests();
+        //psTest.cleanup();
+
+        cacheTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
+        cacheTest.allTests();
+        cacheTest.cleanup();
     }
 }

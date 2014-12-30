@@ -8,6 +8,8 @@ import com.datastax.driver.core.policies.TokenAwarePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Timestamp;
+
 /*
 
 Copyright 2014 Patrick McFadin
@@ -50,6 +52,8 @@ public class TestBase {
         session = cluster.connect(keySpace);
 
         logger.info("Cassandra connection established to: " + clusterIps + " Keyspace: " + keySpace);
+
+        schemaSetup();
     }
 
     /**
@@ -60,5 +64,24 @@ public class TestBase {
         cluster.close();
 
         logger.info("Cassandra connection closed");
+    }
+
+    public void schemaSetup() {
+
+    }
+
+    // Awesome random time generator.
+    // Thanks to dasblinkenlight on stackoverflow.
+
+    public Timestamp randomTimestamp() {
+        return randomTimestamp("2013-01-01 00:00:00", "2014-01-01 00:00:00");
+    }
+
+    public Timestamp randomTimestamp(String fromDate, String toDate) {
+        long offset = Timestamp.valueOf(fromDate).getTime();
+        long end = Timestamp.valueOf(toDate).getTime();
+        long diff = end - offset + 1;
+        Timestamp rand = new Timestamp(offset + (long) (Math.random() * diff));
+        return rand;
     }
 }
