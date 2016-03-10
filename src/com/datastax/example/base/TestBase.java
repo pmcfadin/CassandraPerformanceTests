@@ -1,6 +1,8 @@
 package com.datastax.example.base;
 
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
 import com.datastax.driver.core.policies.DefaultRetryPolicy;
@@ -9,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 
 /*
 
@@ -33,6 +36,7 @@ public class TestBase {
 
     public Cluster cluster;
     public Session session;
+    public static HashMap<String, String> schema;
 
     /**
      * Basic Cassandra connection initializer. Takes the cluster IPs and keyspace. Connects using TokenAwarePolicy.
@@ -46,14 +50,16 @@ public class TestBase {
                 .addContactPoint(clusterIps)
                 .withRetryPolicy(DefaultRetryPolicy.INSTANCE)
                 .withLoadBalancingPolicy(
-                        new TokenAwarePolicy(new DCAwareRoundRobinPolicy()))
+                        new TokenAwarePolicy(DCAwareRoundRobinPolicy.builder().build()))
                 .build();
 
         session = cluster.connect(keySpace);
 
         logger.info("Cassandra connection established to: " + clusterIps + " Keyspace: " + keySpace);
 
-        schemaSetup();
+        if (schema != null) {
+            schemaSetup();
+        }
     }
 
     /**
@@ -67,7 +73,30 @@ public class TestBase {
     }
 
     public void schemaSetup() {
+        //Check for schema
 
+        logger.info("Checking for " + this.getClass().getSimpleName() + " schema");
+
+        for (String tableName: schema.keySet()
+             ) {
+
+
+            ResultSet result = session.execute("select keyspace_name, columnfamily_name from system.schema_columnfamilies where keyspace_name = 'perf_test' and columnfamily_name = '" + tableName + "';");
+
+            if (result.one() == null) {
+                logger.info(tableName + " schema does not exist. Creating...");
+
+                result = session.execute(schema.get(tableName));
+
+                for (Row row : result) {
+                    logger.info(row.toString());
+                }
+                logger.info(tableName + " schema created");
+
+            } else {
+                logger.info(tableName + " schema exists");
+            }
+        }
     }
 
     // Awesome random time generator.

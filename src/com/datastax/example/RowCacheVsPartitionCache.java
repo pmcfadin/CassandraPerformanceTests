@@ -88,7 +88,7 @@ public class RowCacheVsPartitionCache extends TestBase {
                 .formatFor(Locale.US)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .build(new File("/Users/patrick/projects/"));
+                .build(new File("/Users/patrickmcfadin/projects/CassandraPerformanceTests/logs"));
 
         logger.info("Beginning RowCacheVsPartitionCache:Test1 - No Cache");
 
@@ -124,7 +124,7 @@ public class RowCacheVsPartitionCache extends TestBase {
                 .formatFor(Locale.US)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .build(new File("/Users/patrick/projects/"));
+                .build(new File("/Users/patrickmcfadin/projects/CassandraPerformanceTests/logs"));
 
         logger.info("Beginning RowCacheVsPartitionCache:Test2 - Partition Cache");
 

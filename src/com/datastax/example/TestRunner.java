@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.Exchanger;
 
 /*
 Copyright 2014 Patrick McFadin
@@ -52,6 +53,7 @@ public class TestRunner {
         MapSizeTest mapTest = new MapSizeTest();
         PreparedVsNonPreparedStatement psTest = new PreparedVsNonPreparedStatement();
         RowCacheVsPartitionCache cacheTest = new RowCacheVsPartitionCache();
+        GetAndSetTest getAndSetTest = new GetAndSetTest();
 
         //batchTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
        // batchTest.cleanup();
@@ -64,8 +66,14 @@ public class TestRunner {
         //psTest.allTests();
         //psTest.cleanup();
 
-        cacheTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
-        cacheTest.allTests();
-        cacheTest.cleanup();
+        //cacheTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
+        //cacheTest.allTests();
+        //cacheTest.cleanup();
+
+        getAndSetTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
+        getAndSetTest.load();
+        getAndSetTest.test1();
+        getAndSetTest.cleanup();
+
     }
 }

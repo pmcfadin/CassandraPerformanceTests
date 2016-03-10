@@ -57,7 +57,7 @@ public class PreparedVsNonPreparedStatement extends TestBase {
                 .formatFor(Locale.US)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .build(new File("/Users/patrick/projects/"));
+                .build(new File("/Users/patrickmcfadin/projects/CassandraPerformanceTests/logs"));
 
         logger.info("Beginning PreparedVsNonPreparedStatement:Test1");
 
@@ -96,7 +96,7 @@ public class PreparedVsNonPreparedStatement extends TestBase {
                 .formatFor(Locale.US)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .build(new File("/Users/patrick/projects/"));
+                .build(new File("/Users/patrickmcfadin/projects/CassandraPerformanceTests/logs"));
 
         logger.info("Beginning PreparedVsNonPreparedStatement:Test2");
 

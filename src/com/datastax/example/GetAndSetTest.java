@@ -16,7 +16,8 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Created by patrickmcfadin on 2/22/16.
+ * Test to simulate getting a record list from one partition and using the result to set a value in multiple partitions.
+ *
  */
 public class GetAndSetTest extends TestBase {
     final Logger logger = LoggerFactory.getLogger(GetAndSetTest.class);
@@ -37,6 +38,13 @@ public class GetAndSetTest extends TestBase {
                 "    c text,\n" +
                 "    PRIMARY KEY (a)\n" +
                 ");");
+
+        schema.put("lookup_table","CREATE TABLE lookup_table (\n" +
+                "    a int,\n" +
+                "    b uuid,\n" +
+                "    c text,\n" +
+                "    PRIMARY KEY (a,b)\n" +
+                ");");
     }
 
     public void load() {
@@ -50,7 +58,7 @@ public class GetAndSetTest extends TestBase {
         BoundStatement lookupInsert = new BoundStatement(lookupInsertStatement);
 
         UUID staticRecordId;
-        long time = 0;
+        long time;
 
         logger.info("Truncating previous GetAndSetTest records");
 
@@ -87,7 +95,7 @@ public class GetAndSetTest extends TestBase {
         BoundStatement recordUpdate = new BoundStatement(recordUpdateStatement);
 
         long time = System.currentTimeMillis();
-        int records = 0;
+        int records;
 
         // Iterate through each record count number
         for (int recordNumber : recordNumbers) {

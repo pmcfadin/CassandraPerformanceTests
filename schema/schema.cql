@@ -18,7 +18,7 @@ CREATE TABLE users (
     phone int
 );
 
-insert into users (id, firstname, lastname, street, post_code, phone) VALUES (?, ?, ?, ?, ?, ?)
+// insert into users (id, firstname, lastname, street, post_code, phone) VALUES (?, ?, ?, ?, ?, ?)
 
 CREATE TABLE user_search_history (
     id int,
@@ -28,7 +28,7 @@ CREATE TABLE user_search_history (
     PRIMARY KEY (id, search_time)
 ) WITH CLUSTERING ORDER BY (search_time DESC);
 
-insert into user_search_history (id, search_time, search_text, search_results) VALUES (?, ?, ?, ?)
+// insert into user_search_history (id, search_time, search_text, search_results) VALUES (?, ?, ?, ?)
 
 CREATE TABLE user_search_history_with_cache (
     id int,
@@ -38,4 +38,18 @@ CREATE TABLE user_search_history_with_cache (
     PRIMARY KEY (id, search_time)
 ) WITH CLUSTERING ORDER BY (search_time DESC)
 AND caching = { 'keys' : 'ALL', 'rows_per_partition' : '20' };
+
+CREATE TABLE static_records (
+    a uuid,
+    b text,
+    c text,
+    PRIMARY KEY (a)
+);
+
+CREATE TABLE lookup_table (
+    a int,
+    b uuid,
+    c text,
+    PRIMARY KEY (a,b)
+);
 
