@@ -121,7 +121,6 @@ public class GetAndSetTest extends TestBase {
                                 remainingFutures--;
                             }
 
-
                             public void onFailure(Throwable t) {
                                 insertFailure++;
                                 remainingFutures--;

@@ -53,3 +53,23 @@ CREATE TABLE lookup_table (
     PRIMARY KEY (a,b)
 );
 
+CREATE TABLE timeseries (
+    a uuid,
+    b timestamp,
+    c text,
+   PRIMARY KEY (a, b)
+) with clustering order by (b desc);
+
+//TWCS
+ALTER TABLE timeseries with
+compaction= {
+'compaction_window_unit': 'HOURS',
+'compaction_window_size': '1',
+'class':'TimeWindowCompactionStrategy'
+};
+
+//DTCS
+AND
+    compaction = {'class': 'DateTieredCompactionStrategy',
+    'timestamp_resolution':'seconds', 'base_time_seconds':'225',
+    'max_window_size_seconds': 3600,  'max_sstable_age_days':'365'};

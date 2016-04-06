@@ -57,9 +57,9 @@ public class TestBase {
 
         logger.info("Cassandra connection established to: " + clusterIps + " Keyspace: " + keySpace);
 
-        if (schema != null) {
+        /*        if (schema != null) {
             schemaSetup();
-        }
+        }*/
     }
 
     /**

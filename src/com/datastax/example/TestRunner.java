@@ -49,11 +49,18 @@ public class TestRunner {
             System.exit(1);
         }
 
+        String tests[] = prop.getProperty("tests").split(",");
+
         BatchVsExecuteAsync batchTest = new BatchVsExecuteAsync();
         MapSizeTest mapTest = new MapSizeTest();
         PreparedVsNonPreparedStatement psTest = new PreparedVsNonPreparedStatement();
         RowCacheVsPartitionCache cacheTest = new RowCacheVsPartitionCache();
         GetAndSetTest getAndSetTest = new GetAndSetTest();
+        TimeSeriesInsert timeSeriesInsert = new TimeSeriesInsert();
+
+        timeSeriesInsert.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
+        timeSeriesInsert.load();
+        timeSeriesInsert.cleanup();
 
         //batchTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
        // batchTest.cleanup();
@@ -70,10 +77,10 @@ public class TestRunner {
         //cacheTest.allTests();
         //cacheTest.cleanup();
 
-        getAndSetTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
-        getAndSetTest.load();
-        getAndSetTest.test1();
-        getAndSetTest.cleanup();
+        //getAndSetTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
+        //getAndSetTest.load();
+        //getAndSetTest.test1();
+        //getAndSetTest.cleanup();
 
     }
 }
