@@ -13,7 +13,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Test to simulate getting a record list from one partition and using the result to set a value in multiple partitions.

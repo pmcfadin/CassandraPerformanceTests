@@ -97,7 +97,7 @@ public class RowCacheVsPartitionCache extends TestBase {
         BoundStatement userSearchSelect = new BoundStatement(userSearchSelectStatement);
         reporter.start(1, TimeUnit.SECONDS);
 
-        int id = 0;
+        int id;
 
         //Insert 10000
         for (int i = 0; i < 1000000; i++) {
@@ -133,7 +133,7 @@ public class RowCacheVsPartitionCache extends TestBase {
         BoundStatement userSearchSelect = new BoundStatement(userSearchSelectStatement);
         reporter.start(1, TimeUnit.SECONDS);
 
-        int id = 0;
+        int id;
 
         //Insert 10000
         for (int i = 0; i < 1000000; i++) {
