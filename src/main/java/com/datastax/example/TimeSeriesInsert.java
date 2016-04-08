@@ -32,8 +32,11 @@ public class TimeSeriesInsert extends TestBase {
 
         switch(durationUnits){
             case "SECOND": baseTime.add(Calendar.SECOND, duration);
+                break;
             case "MINUTE": baseTime.add(Calendar.MINUTE, duration);
+                break;
             case "HOUR": baseTime.add(Calendar.HOUR, duration);
+                break;
 
             //If no usable input, run for 30 seconds
             default: baseTime.add(Calendar.SECOND, 30);
