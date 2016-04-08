@@ -46,6 +46,14 @@
     <build>
         <plugins>
             <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>1.8</source>
+                <target>1.8</target>
+            </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptorRefs>
@@ -53,7 +61,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.datastax.example.TestRunner</mainClass>
+                            <mainClass>main.example.TestRunner</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -80,7 +88,7 @@
                             <configuration>
                                 <transformers>
                                     <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                        <mainClass>com.datastax.example.TestRunner</mainClass>
+                                        <mainClass>main.example.TestRunner</mainClass>
                                     </transformer>
                                 </transformers>
                             </configuration>
