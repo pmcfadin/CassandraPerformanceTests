@@ -24,14 +24,26 @@ public class TimeSeriesInsert extends TestBase {
     static final MetricRegistry metrics = new MetricRegistry();
     private final Timer load = metrics.timer(MetricRegistry.name(TimeSeriesInsert.class, "load"));
 
-    public void load() {
+    public void load(String durationUnits, int duration) {
         logger.info("Beginning TimeSeriesInsert:load");
 
+        // Set test duration
         Calendar baseTime = Calendar.getInstance();
-        baseTime.add(Calendar.HOUR, 1);
+
+        switch(durationUnits){
+            case "SECOND": baseTime.add(Calendar.SECOND, duration);
+            case "MINUTE": baseTime.add(Calendar.MINUTE, duration);
+            case "HOUR": baseTime.add(Calendar.HOUR, duration);
+
+            //If no usable input, run for 30 seconds
+            default: baseTime.add(Calendar.SECOND, 30);
+
+        }
 
         long timeToStop = baseTime.getTimeInMillis();
 
+        logger.info("TimeSeriesInsert: Test duration unit " + durationUnits + " for length " + duration);
+        logger.info("TimeSeriesInsert: Test will end at " + baseTime.getTime().toString());
 
         PreparedStatement recordInsertStatement = session.prepare("insert into timeseries (a, b, c) VALUES (?, ?, ?)");
         BoundStatement recordInsert = new BoundStatement(recordInsertStatement);

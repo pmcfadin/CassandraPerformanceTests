@@ -37,8 +37,14 @@ public class TestRunner {
 
         Properties prop = new Properties();
 
+        String propFileLocation = "resources/test.properties";
+
+        if (args.length > 0 && args[0].equalsIgnoreCase("-c")) {
+            propFileLocation = args[1];
+        }
+
         try {
-            prop.load(new FileInputStream("resources/test.properties"));
+            prop.load(new FileInputStream(propFileLocation));
 
         } catch (FileNotFoundException e) {
            logger.error("test.properties not found");
@@ -58,7 +64,7 @@ public class TestRunner {
         TimeSeriesInsert timeSeriesInsert = new TimeSeriesInsert();
 
         timeSeriesInsert.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
-        timeSeriesInsert.load();
+        timeSeriesInsert.load(prop.getProperty("duration_unit"), Integer.parseInt(prop.getProperty("duration")));
         timeSeriesInsert.cleanup();
 
         //batchTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
