@@ -20,7 +20,7 @@ import java.util.UUID;
  */
 public class TimeSeriesInsert extends TestBase {
 
-    final Logger logger = LoggerFactory.getLogger(GetAndSetTest.class);
+    final Logger logger = LoggerFactory.getLogger(TimeSeriesInsert.class);
     static final MetricRegistry metrics = new MetricRegistry();
     private final Timer load = metrics.timer(MetricRegistry.name(TimeSeriesInsert.class, "load"));
 
