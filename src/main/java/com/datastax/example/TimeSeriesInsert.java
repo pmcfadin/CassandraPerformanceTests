@@ -49,6 +49,7 @@ public class TimeSeriesInsert extends TestBase {
 
         logger.info("TimeSeriesInsert: Test duration unit " + durationUnits + " for length " + duration);
         logger.info("TimeSeriesInsert: Test will end at " + baseTime.getTime().toString());
+        logger.info("TimeSeriesInsert: Test will end with " + recordCount + " records inserted" );
 
         PreparedStatement recordInsertStatement = session.prepare("insert into timeseries (a, b, c) VALUES (?, ?, ?)");
         BoundStatement recordInsert = new BoundStatement(recordInsertStatement);
