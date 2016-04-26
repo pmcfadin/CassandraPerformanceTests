@@ -64,7 +64,7 @@ public class TestRunner {
         TimeSeriesInsert timeSeriesInsert = new TimeSeriesInsert();
 
         timeSeriesInsert.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
-        timeSeriesInsert.load(prop.getProperty("duration_unit"), Integer.parseInt(prop.getProperty("duration")));
+        timeSeriesInsert.load(prop.getProperty("duration_unit"), Integer.parseInt(prop.getProperty("duration")),  Integer.parseInt(prop.getProperty("record_count")));
         timeSeriesInsert.cleanup();
 
         //batchTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
