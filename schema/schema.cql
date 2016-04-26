@@ -54,7 +54,7 @@ CREATE TABLE lookup_table (
 );
 
 CREATE TABLE timeseries (
-    a uuid,
+    a int,
     b timestamp,
     c text,
    PRIMARY KEY (a, b)
@@ -69,7 +69,9 @@ compaction= {
 };
 
 //DTCS
-AND
+ALTER TABLE timeseries with
     compaction = {'class': 'DateTieredCompactionStrategy',
-    'timestamp_resolution':'seconds', 'base_time_seconds':'225',
-    'max_window_size_seconds': 3600,  'max_sstable_age_days':'365'};
+'min_threshold': 4, 'base_time_seconds': 225,
+    'max_window_size_seconds': 3600,  'max_sstable_age_days':365};
+
+max_window_size_seconds = 3600, min_threshold=4, base_time_seconds=225
