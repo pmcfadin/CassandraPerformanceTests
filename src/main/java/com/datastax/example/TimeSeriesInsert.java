@@ -68,22 +68,25 @@ public class TimeSeriesInsert extends TestBase {
             // Store one day of second resolution data per partition
             for(int i = 0; i < 86400; i++) {
 
+                String time = timeseriesEpoch.getTime().toString();
+
                 // Use execute to make sure each record is inserted and the return code is correct.
-                session.execute(recordInsert.bind(Integer.parseInt(formatDayOnly.format(timeseriesEpoch.getTime())), new java.sql.Date(timeseriesEpoch.getTimeInMillis()), RandomStringUtils.randomAlphabetic(1024)));
+                session.execute(recordInsert.bind(Integer.parseInt(formatDayOnly.format(timeseriesEpoch.getTime())), timeseriesEpoch.getTime(), RandomStringUtils.randomAlphabetic(1024)));
                 currentRecordCount++;
 
                 //Advance the epoch by one second
                 timeseriesEpoch.add(Calendar.SECOND, 1);
 
-                if(currentRecordCount > recordCount)
-                    break;
-
                 if((recordCount % 100000) == 0){
                     logger.info("Records loaded: " + currentRecordCount);
                 }
             }
+
+            // Break at an even day boundry
+            if(currentRecordCount > recordCount)
+                break;
         }
-        logger.info("Ending TimeSeriesInsert:load. Total records loaded: " + recordCount);
+        logger.info("Ending TimeSeriesInsert:load. Total records loaded: " + currentRecordCount);
     }
 }
 
