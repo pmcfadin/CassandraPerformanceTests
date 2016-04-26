@@ -77,7 +77,7 @@ public class TimeSeriesInsert extends TestBase {
                 //Advance the epoch by one second
                 timeseriesEpoch.add(Calendar.SECOND, 1);
 
-                if((recordCount % 100000) == 0){
+                if((currentRecordCount % 100000) == 0){
                     logger.info("Records loaded: " + currentRecordCount);
                 }
             }
