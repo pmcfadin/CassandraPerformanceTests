@@ -37,6 +37,9 @@ public class TestBase {
     public Cluster cluster;
     public Session session;
     public static HashMap<String, String> schema;
+    public boolean useGraphite;
+    public String graphiteHost;
+    public String graphitePrefix;
 
     /**
      * Basic Cassandra connection initializer. Takes the cluster IPs and keyspace. Connects using TokenAwarePolicy.
@@ -44,7 +47,12 @@ public class TestBase {
      * @param clusterIps
      * @param keySpace
      */
-    public void initialize(String clusterIps, String keySpace) {
+
+    public void initialize(String clusterIps, String keySpace){
+        this.initialize(clusterIps, keySpace, "false", null, null);
+    }
+
+    public void initialize(String clusterIps, String keySpace, String useGraphite, String graphiteHost, String graphitePrefix) {
         cluster = Cluster
                 .builder()
                 .addContactPoint(clusterIps)
@@ -56,6 +64,12 @@ public class TestBase {
         session = cluster.connect(keySpace);
 
         logger.info("Cassandra connection established to: " + clusterIps + " Keyspace: " + keySpace);
+
+        if (useGraphite.equalsIgnoreCase("true")){
+            this.useGraphite = true;
+        }
+        this.graphiteHost = graphiteHost;
+        this.graphitePrefix = graphitePrefix;
 
         /*        if (schema != null) {
             schemaSetup();

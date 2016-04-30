@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 /*
@@ -54,7 +56,7 @@ public class TestRunner {
             System.exit(1);
         }
 
-        String tests[] = prop.getProperty("tests").split(",");
+        List<String> tests = Arrays.asList(prop.getProperty("tests").split(","));
 
         BatchVsExecuteAsync batchTest = new BatchVsExecuteAsync();
         MapSizeTest mapTest = new MapSizeTest();
@@ -63,8 +65,15 @@ public class TestRunner {
         GetAndSetTest getAndSetTest = new GetAndSetTest();
         TimeSeriesInsert timeSeriesInsert = new TimeSeriesInsert();
 
-        timeSeriesInsert.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));
-        timeSeriesInsert.load(prop.getProperty("duration_unit"), Integer.parseInt(prop.getProperty("duration")),  Integer.parseInt(prop.getProperty("record_count")));
+
+        timeSeriesInsert.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"), prop.getProperty("use_graphite"), prop.getProperty("graphite_host"), prop.getProperty("graphite_prefix"));
+
+        if (tests.contains("TimeSeriesInsert.load"))
+            timeSeriesInsert.load(prop.getProperty("duration_unit"), Integer.parseInt(prop.getProperty("duration")),  Integer.parseInt(prop.getProperty("record_count")));
+
+        if (tests.contains("TimeSeriesInsert.randomRead"))
+            timeSeriesInsert.randomRead(prop.getProperty("duration_unit"), Integer.parseInt(prop.getProperty("duration")),  Integer.parseInt(prop.getProperty("record_count")));
+
         timeSeriesInsert.cleanup();
 
         //batchTest.initialize(prop.getProperty("cluster_ips"), prop.getProperty("keyspace"));

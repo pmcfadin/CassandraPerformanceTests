@@ -187,7 +187,7 @@ public class TimeSeriesInsert extends TestBase {
         logger.info("Total unsuccessful reads " + readFailure.getCount());
         logger.info("Total reads with data " + readFull.getCount());
         logger.info("Total reads without data " + readEmpty.getCount());
-        logger.info("Read response 1 minute " + readResponses.getOneMinuteRate());
+        logger.info("Read response 1 minute " + readResponses.getSnapshot().getMean());
         reporter.stop();
     }
 
