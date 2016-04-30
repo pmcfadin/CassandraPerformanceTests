@@ -17,8 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
@@ -113,7 +115,7 @@ public class TimeSeriesInsert extends TestBase {
 
         // a = YYYYMMDD
         // b = YYYYMMDD HH:mm:SS.s
-        PreparedStatement recordSelectStatement = session.prepare("select c  from timeseries where a = ? AND b = ?");
+        PreparedStatement recordSelectStatement = session.prepare("select a, b, c  from timeseries where a = ? AND b = ?");
         BoundStatement recordSelect = new BoundStatement(recordSelectStatement);
 
         ResultSet rs;
@@ -144,7 +146,11 @@ public class TimeSeriesInsert extends TestBase {
             for (int i = 0; i < 86400; i++) {
 
                 final Timer.Context context = readResponses.time();
-                ResultSetFuture future = session.executeAsync(recordSelect.bind(aValue, timeSeriesRandomDate.getTime()));
+
+                BoundStatement statement = recordSelect.bind(aValue, timeSeriesRandomDate.getTime());
+
+
+                ResultSetFuture future = session.executeAsync(statement);
 
                 Futures.addCallback(future,
                         new FutureCallback<ResultSet>() {
@@ -152,7 +158,6 @@ public class TimeSeriesInsert extends TestBase {
                             public void onSuccess(ResultSet result) {
                                 context.stop();
                                 readSuccess.mark();
-                                Row row = result.one();
 
                                 if (result.getAvailableWithoutFetching() > 0) {
                                     readFull.mark();
