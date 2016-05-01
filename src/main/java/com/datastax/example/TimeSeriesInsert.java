@@ -115,30 +115,28 @@ public class TimeSeriesInsert extends TestBase {
 
         // a = YYYYMMDD
         // b = YYYYMMDD HH:mm:SS.s
-        PreparedStatement recordSelectStatement = session.prepare("select c from timeseries where a = ?");
+        PreparedStatement recordSelectStatement = session.prepare("select c from timeseries where a = ? and b = ?");
         BoundStatement recordSelect = new BoundStatement(recordSelectStatement);
-
-        ResultSet rs;
 
         // Set test duration
         Calendar baseTime = getBaseTime(durationUnits, duration);
 
 
         long timeToStop = baseTime.getTimeInMillis();
-        long now = System.currentTimeMillis();
 
-        long currentRecordCount = 0;
+        logger.info("TimeSeriesInsert: Test duration unit " + durationUnits + " for length " + duration);
+        logger.info("TimeSeriesInsert: Test will end at " + baseTime.getTime().toString());
+
+        long now = System.currentTimeMillis();
 
         SimpleDateFormat formatDayOnly = new SimpleDateFormat("yyyyMMdd");
 
         // Set time series epoch date to Jan 1, 2000 at midnight
-        int year = randomNumberInRange(2000, 2010);
-        int month = randomNumberInRange(1,12);
-        int day = randomNumberInRange(1,28);
 
-        Calendar timeSeriesRandomDate = new GregorianCalendar(year, month, day,0,0,0);
+        Calendar timeSeriesRandomDate = new GregorianCalendar(2000,0,1,0,0,0);
 
         int aValue = Integer.parseInt(formatDayOnly.format(timeSeriesRandomDate.getTime()));
+
 
         while(now < timeToStop) {
             now = System.currentTimeMillis();
@@ -147,7 +145,7 @@ public class TimeSeriesInsert extends TestBase {
 
                 final Timer.Context context = readResponses.time();
 
-                BoundStatement statement = recordSelect.bind(aValue);
+                BoundStatement statement = recordSelect.bind(aValue, timeSeriesRandomDate.getTime());
 
 
                 ResultSetFuture future = session.executeAsync(statement);
@@ -177,6 +175,9 @@ public class TimeSeriesInsert extends TestBase {
 
                 //Advance the time by one second
                 timeSeriesRandomDate.add(Calendar.SECOND, 1);
+
+                //Make sure we have a new a value with the advanced time
+                aValue = Integer.parseInt(formatDayOnly.format(timeSeriesRandomDate.getTime()));
             }
 
         }
