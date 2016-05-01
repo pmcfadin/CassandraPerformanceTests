@@ -115,7 +115,7 @@ public class TimeSeriesInsert extends TestBase {
 
         // a = YYYYMMDD
         // b = YYYYMMDD HH:mm:SS.s
-        PreparedStatement recordSelectStatement = session.prepare("select a, b, c  from timeseries where a = ? AND b = ?");
+        PreparedStatement recordSelectStatement = session.prepare("select c from timeseries where a = ?");
         BoundStatement recordSelect = new BoundStatement(recordSelectStatement);
 
         ResultSet rs;
@@ -147,7 +147,7 @@ public class TimeSeriesInsert extends TestBase {
 
                 final Timer.Context context = readResponses.time();
 
-                BoundStatement statement = recordSelect.bind(aValue, timeSeriesRandomDate.getTime());
+                BoundStatement statement = recordSelect.bind(aValue);
 
 
                 ResultSetFuture future = session.executeAsync(statement);
