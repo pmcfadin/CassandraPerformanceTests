@@ -34,6 +34,12 @@ public class TimeSeriesInsert extends TestBase {
     final Logger logger = LoggerFactory.getLogger(TimeSeriesInsert.class);
     static final MetricRegistry metrics = new MetricRegistry();
     private final Meter readRequests = metrics.meter("read-requests");
+
+    private final Meter writeFailure = metrics.meter(MetricRegistry.name(TimeSeriesInsert.class, "write-failure"));
+    private final Meter writeSuccess = metrics.meter(MetricRegistry.name(TimeSeriesInsert.class, "write-success"));
+    private final Timer writeResponses = metrics.timer(MetricRegistry.name(TimeSeriesInsert.class, "writes"));
+
+
     private final Meter readFull = metrics.meter(MetricRegistry.name(TimeSeriesInsert.class, "read-has-data"));
     private final Meter readEmpty = metrics.meter(MetricRegistry.name(TimeSeriesInsert.class, "read-no-data"));
     private final Meter readFailure = metrics.meter(MetricRegistry.name(TimeSeriesInsert.class, "read-failure"));
@@ -45,9 +51,22 @@ public class TimeSeriesInsert extends TestBase {
 
 
     public void load(String durationUnits, int duration, int recordCount) {
+
         logger.info("Beginning TimeSeriesInsert:load");
 
         SimpleDateFormat formatDayOnly = new SimpleDateFormat("yyyyMMdd");
+
+        if (useGraphite) {
+            graphite = new Graphite(new InetSocketAddress(graphiteHost, 2003));
+            reporter = GraphiteReporter.forRegistry(metrics)
+                    .prefixedWith(graphitePrefix)
+                    .convertRatesTo(TimeUnit.SECONDS)
+                    .convertDurationsTo(TimeUnit.MILLISECONDS)
+                    .filter(MetricFilter.ALL)
+                    .build(graphite);
+
+            reporter.start(1, TimeUnit.MINUTES);
+        }
 
         // Set test duration
         Calendar baseTime = getBaseTime(durationUnits, duration);
@@ -61,6 +80,7 @@ public class TimeSeriesInsert extends TestBase {
         PreparedStatement recordInsertStatement = session.prepare("insert into timeseries (a, b, c) VALUES (?, ?, ?)");
         BoundStatement recordInsert = new BoundStatement(recordInsertStatement);
 
+        long startTime = System.currentTimeMillis();
         long now = System.currentTimeMillis();
 
         long currentRecordCount = 0;
@@ -77,14 +97,33 @@ public class TimeSeriesInsert extends TestBase {
 
                 String time = timeseriesEpoch.getTime().toString();
 
-                // Use execute to make sure each record is inserted and the return code is correct.
-                session.execute(recordInsert.bind(Integer.parseInt(formatDayOnly.format(timeseriesEpoch.getTime())), timeseriesEpoch.getTime(), RandomStringUtils.randomAlphabetic(1024)));
+                final Timer.Context context = writeResponses.time();
+
                 currentRecordCount++;
+
+                // Use execute to make sure each record is inserted and the return code is correct.
+                ResultSetFuture future = session.executeAsync(recordInsert.bind(Integer.parseInt(formatDayOnly.format(timeseriesEpoch.getTime())), timeseriesEpoch.getTime(), RandomStringUtils.randomAlphabetic(1024)));
+
+                Futures.addCallback(future,
+                        new FutureCallback<ResultSet>() {
+
+                            public void onSuccess(ResultSet result) {
+                                context.stop();
+                                writeSuccess.mark();
+                            }
+
+                            public void onFailure(Throwable t) {
+                                context.stop();
+                                writeFailure.mark();
+                            }
+                        },
+                        MoreExecutors.sameThreadExecutor()
+                );
 
                 //Advance the epoch by one second
                 timeseriesEpoch.add(Calendar.SECOND, 1);
 
-                if((currentRecordCount % 100000) == 0){
+                if((currentRecordCount % 1000000) == 0){
                     logger.info("Records loaded: " + currentRecordCount);
                 }
             }
@@ -94,6 +133,11 @@ public class TimeSeriesInsert extends TestBase {
                 break;
         }
         logger.info("Ending TimeSeriesInsert:load. Total records loaded: " + currentRecordCount);
+        logger.info("Total successful writes " + writeSuccess.getCount());
+        logger.info("Total unsuccessful writes " + writeFailure.getCount());
+        logger.info("Write 1 minute 95th percentile " + writeResponses.getSnapshot().get95thPercentile());
+        logger.info("Total time to insert " + getElapsedTimeHoursMinutesFromMilliseconds(now - startTime));
+        reporter.stop();
     }
 
     public void randomRead(String durationUnits, int duration, int recordCount){
@@ -220,6 +264,21 @@ public class TimeSeriesInsert extends TestBase {
         }
 
         return baseTime;
+    }
+
+    /*
+    Totally found this here: http://www.java2s.com/Code/Java/Development-Class/Elapsedtimeinhoursminutesseconds.htm
+    Thanks whoever wrote it!
+
+     */
+    public static String getElapsedTimeHoursMinutesFromMilliseconds(long milliseconds) {
+        String format = String.format("%%0%dd", 2);
+        long elapsedTime = milliseconds / 1000;
+        String seconds = String.format(format, elapsedTime % 60);
+        String minutes = String.format(format, (elapsedTime % 3600) / 60);
+        String hours = String.format(format, elapsedTime / 3600);
+        String time =  hours + ":" + minutes + ":" + seconds;
+        return time;
     }
 }
 
